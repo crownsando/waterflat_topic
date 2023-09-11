@@ -296,7 +296,7 @@ import os
 
 def create_date_directory(base_path):
     # 현재 날짜 정보 가져오기
-    current_date = datetime.date.today()
+    current_date = datetime.now()
 
     # 년, 월, 일 추출
     year = current_date.year
