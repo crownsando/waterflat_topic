@@ -197,8 +197,6 @@ for r in rm:
 
 data = data[data['content'].apply(lambda x: x.strip() != '')]
 
-from datetime import datetime
-
 today = datetime.now()
 today = today.strftime('%Y%m%d')
 
@@ -295,7 +293,6 @@ topic_words_df['summerize'] = summerize[1:]
 """## 4. json으로 export"""
 
 import os
-import datetime
 
 def create_date_directory(base_path):
     # 현재 날짜 정보 가져오기
