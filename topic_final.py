@@ -202,7 +202,7 @@ from datetime import datetime
 today = datetime.now()
 today = today.strftime('%Y%m%d')
 
-text_data = '/raw_data/'+ today +'.txt'
+text_data = './raw_data/'+ today +'.txt'
 
 with open(text_data, 'w') as f:
     for value in data['content']:
