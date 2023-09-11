@@ -331,7 +331,7 @@ create_date_directory(base_directory)
 import json
 
 today = datetime.now()
-today = today.strftime('%Y%m%d')
+today = today.strftime('%Y/%m/%d')
 
 # 저장할 경로와 파일 이름 설정
 news_file_path = base_directory + today + "/news.json"
