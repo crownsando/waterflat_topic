@@ -268,6 +268,10 @@ df.groupby('topic_num')['cnts'].count()
 
 def textRank(docs):
   result_sent = []
+
+  split_list = docs.split('.')
+  sents = [item.strip() for item in split_list if item.strip() != ""]
+
   from textrank import KeysentenceSummarizer
 
   summarizer = KeysentenceSummarizer(
