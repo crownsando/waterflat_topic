@@ -334,8 +334,8 @@ today = datetime.now()
 today = today.strftime('%Y%m%d')
 
 # 저장할 경로와 파일 이름 설정
-news_file_path = base_directory + today.strftime('%Y/%m/%d') + "/news.json"
-topics_file_path = base_directory + today.strftime('%Y/%m/%d') + "/topics.json"
+news_file_path = base_directory + today + "/news.json"
+topics_file_path = base_directory + today + "/topics.json"
 
 # JSON 데이터를 파일에 쓰기
 news_df.to_json(news_file_path,force_ascii=False,indent=4)
