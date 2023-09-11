@@ -325,7 +325,7 @@ def create_date_directory(base_path):
 
     return day_dir
 
-base_directory = 'json_data/'  # 기본 디렉토리 경로를 설정하세요.
+base_directory = './json_data/'  # 기본 디렉토리 경로를 설정하세요.
 create_date_directory(base_directory)
 
 import json
