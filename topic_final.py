@@ -179,18 +179,6 @@ print("중복 제거 후 행 개수: ",len(news_df))
 ### 2-0) BERTopic install
 """
 
-!pip install bertopic
-
-!pip install bertopic[visualization]
-
-# Commented out IPython magic to ensure Python compatibility.
-# Colab에 Mecab 설치
-!git clone https://github.com/SOMJANG/Mecab-ko-for-Google-Colab.git
-# %cd Mecab-ko-for-Google-Colab
-!bash install_mecab-ko_on_colab_light_220429.sh
-
-
-
 """### 2-1) 전처리"""
 
 from tqdm import tqdm
@@ -209,7 +197,12 @@ for r in rm:
 
 data = data[data['content'].apply(lambda x: x.strip() != '')]
 
-text_data = '/content/data.txt'
+from datetime import datetime
+
+today = datetime.now()
+today = today.strftime('%Y%m%d')
+
+text_data = '/raw_data/'+ today +'.txt'
 
 with open(text_data, 'w') as f:
     for value in data['content']:
@@ -272,11 +265,6 @@ df.groupby('topic_num')['cnts'].count()
 
 """## 3. TextRank : 주요 문장 추출"""
 
-# konlpy설치
-!apt-get update
-!apt-get install g++ openjdk-8-jdk
-!pip install konlpy JPype1-py3
-!bash <(curl -s https://raw.githubusercontent.com/konlpy/konlpy/master/scripts/mecab.sh)
 
 def textRank(docs):
   result_sent = []
@@ -336,10 +324,9 @@ def create_date_directory(base_path):
 
     return day_dir
 
-base_directory = 'content/'  # 기본 디렉토리 경로를 설정하세요.
+base_directory = 'json_data/'  # 기본 디렉토리 경로를 설정하세요.
 create_date_directory(base_directory)
 
-from datetime import datetime
 import json
 
 today = datetime.now()
