@@ -337,6 +337,43 @@ today = today.strftime('%Y/%m/%d')
 news_file_path = base_directory + today + "/news.json"
 topics_file_path = base_directory + today + "/topics.json"
 
-# JSON 데이터를 파일에 쓰기
+s3_news_path = 'models/' + today + "/news.json"
+s3_topic_path = 'models/' + today + "/topics.json"
+
+# JSON 로 내보내기 & 저장
 news_df.to_json(news_file_path,force_ascii=False,indent=4)
 topic_words_df.to_json(topics_file_path,force_ascii=False,indent=4)
+
+# S3 연결 및 업로드
+import boto3
+
+ACCESS_KEY_ID = '' #s3 관련 권한을 가진 IAM계정 정보
+ACCESS_SECRET_KEY = ''
+BUCKET_NAME = ''
+
+def s3_connection():
+    try:
+        # s3 클라이언트 생성
+        s3 = boto3.client(
+            service_name="s3",
+            region_name="ap-northeast-2",
+            aws_access_key_id=ACCESS_KEY_ID,
+            aws_secret_access_key=ACCESS_SECRET_KEY,
+        )
+    except Exception as e:
+        print(e)
+    else:
+        print("s3 bucket connected!") 
+        return s3
+        
+s3 = s3_connection()
+
+try:
+    s3.upload_file(news_file_path,BUCKET_NAME,s3_news_path)
+except Exception as e:
+    print('news save error : ', e)
+
+try:
+    s3.upload_file(topics_file_path,BUCKET_NAME,s3_topic_path)
+except Exception as e:
+    print('topic save error : ', e)
