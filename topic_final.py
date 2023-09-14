@@ -189,8 +189,8 @@ from bertopic import BERTopic
 data = news_df
 
 rm = ['\r','\n','\t',r'\u','“','”','‘','▲','■',"'",'"','\xa0',\
-      '(서울=연합뉴스)','[연합뉴스 자료사진]','(서울=뉴스1)','[서울=뉴시스]','게티이미지뱅크',
-      '기자','제공','금융','뉴스','사진','스포츠서울','연합뉴스','기사문의 및 제보','앵커']
+      '[',']', '(서울=연합뉴스)','[연합뉴스 자료사진]','(서울=뉴스1)','[서울=뉴시스]','게티이미지뱅크',
+      '기자','제공','금융','뉴스','사진','스포츠서울','연합뉴스','기사문의 및 제보','앵커','[]']
 
 for r in rm:
   data['content'] = data['content'].apply(lambda x : x.replace(r,''))
@@ -238,9 +238,9 @@ model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base
 
 topics, probs = model.fit_transform(preprocessed_documents)
 
-model.visualize_topics()
+# model.visualize_topics()
 
-model.visualize_distribution(probs[0])
+# model.visualize_distribution(probs[0])
 
 news_df['topic_num'] = topics
 
@@ -377,3 +377,6 @@ try:
     s3.upload_file(topics_file_path,BUCKET_NAME,s3_topic_path)
 except Exception as e:
     print('topic save error : ', e)
+
+del topics
+del probs
