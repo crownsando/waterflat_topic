@@ -185,12 +185,13 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
 from bertopic import BERTopic
+from umap import UMAP
 
 data = news_df
 
 rm = ['\r','\n','\t',r'\u','“','”','‘','▲','■',"'",'"','\xa0',\
-      '[',']', '(서울=연합뉴스)','[연합뉴스 자료사진]','(서울=뉴스1)','[서울=뉴시스]','게티이미지뱅크',
-      '기자','제공','금융','뉴스','사진','스포츠서울','연합뉴스','기사문의 및 제보','앵커','[]']
+      '(서울=연합뉴스)','[연합뉴스 자료사진]','(서울=뉴스1)','[서울경제]','[서울=뉴시스]','게티이미지뱅크',
+      '기자','제공','금융','뉴스','사진','스포츠서울','연합뉴스','기사문의 및 제보','앵커','][']
 
 for r in rm:
   data['content'] = data['content'].apply(lambda x : x.replace(r,''))
@@ -231,8 +232,16 @@ custom_tokenizer = CustomTokenizer(Mecab())
 
 vectorizer = CountVectorizer(tokenizer=custom_tokenizer, max_features=8000)
 
-model = BERTopic(embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens", \
+umap_model = UMAP(n_neighbors=15, n_components=5, \
+                  min_dist=0.0, metric='cosine',random_state=42)
+
+# embedding_model="sentence-transformers/xlm-r-100langs-bert-base-nli-stsb-mean-tokens"
+# embedding_model="sentence-transformers/all-MiniLM-L6-v2"
+
+model = BERTopic(embedding_model="jhgan/ko-sroberta-multitask",\
                  vectorizer_model=vectorizer,
+                 umap_model=umap_model,
+                #  nr_topics = 10,
                  top_n_words=10,
                  calculate_probabilities=True)
 
@@ -267,7 +276,7 @@ df.groupby('topic_num')['cnts'].count()
 def textRank(docs):
   result_sent = []
 
-  split_list = docs.split('.')
+  split_list = docs.split('다.')
   sents = [item.strip() for item in split_list if item.strip() != ""]
 
   from textrank import KeysentenceSummarizer
@@ -279,7 +288,7 @@ def textRank(docs):
   )
   keysents = summarizer.summarize(sents, topk=3)
   for _, _, sent in keysents:
-      result_sent.append(sent)
+      result_sent.append(sent+'다.')
 
   return result_sent
 
@@ -349,7 +358,7 @@ import boto3
 
 ACCESS_KEY_ID = '' #s3 관련 권한을 가진 IAM계정 정보
 ACCESS_SECRET_KEY = ''
-BUCKET_NAME = ''
+BUCKET_NAME = 'wont-bucket'
 
 def s3_connection():
     try:
@@ -378,5 +387,24 @@ try:
 except Exception as e:
     print('topic save error : ', e)
 
-del topics
-del probs
+#s3에 파일이 있는 지 확인
+def check_file_exist(file_path):
+   try :
+      s3.head_object(Bucket=BUCKET_NAME,Key=file_path)
+      print(file_path," exists in S3 bucket = ", BUCKET_NAME)
+   except NoCredentialsError:
+        print("AWS credentials not found. Make sure your AWS credentials are configured correctly.")
+   except PartialCredentialsError:
+        print("AWS credentials are partially provided. Make sure your AWS credentials are complete.")
+   except ClientError as e:
+        if e.response['Error']['Code'] == '404':
+            # 객체가 없는 경우
+            print(f"{file_path} does not exist in S3 bucket {BUCKET_NAME}.")
+        else:
+            # 다른 예외 처리
+            print(f"An error occurred: {str(e)}")
+   except Exception as e:
+        print(f"An error occurred: {str(e)}")
+
+check_file_exist(s3_news_path)
+check_file_exist(s3_topic_path)
